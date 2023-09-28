@@ -1,4 +1,6 @@
-import matplotlib.pyplot as plt
+#Author: Alvaro Pay Lozano
+
+matplotlib.pyplot as plt
 import numpy as np
 import os
 from interpolation import read_vtu, interpolate
@@ -39,8 +41,8 @@ x_center, y_center = (x_range[0]+x_range[1]) / 2, (y_range[0]+y_range[1]) / 2
 width = x_range[1]-x_range[0]
 height = 1
 
-output_path = "/local/disk/apay/test/preprocessing_gpu/data_X.pkl"
-output_path_2 = "/local/disk/apay/test/preprocessing_gpu/data_Y.pkl"
+output_path = "PATH/dataX.pxl"
+output_path_2 = "PATH/dataY.pkl"
 
 #Geometry input
 Ns, Nc, Nx, Ny = len(inp), 3, resolution, resolution
