@@ -7,9 +7,9 @@ from matplotlib import pyplot as plt
 
 matplotlib.use('tkagg')
 
-model_filename = "C:/Users/USUARIO/Desktop/Uni/Master/OUTGOING/Erasmus/Q2/Thesis/DeepCFD/Training_v1/test_v5.pt"
-data_x_filename = "C:/Users/USUARIO/Desktop/Uni/Master/OUTGOING/Erasmus/Q2/Thesis/DeepCFD/Training_v1/data_X.pkl"
-data_y_filename = "C:/Users/USUARIO/Desktop/Uni/Master/OUTGOING/Erasmus/Q2/Thesis/DeepCFD/Training_v1/data_Y.pkl"
+model_filename = "PATH/model.pt"
+data_x_filename = "PATH/dataX.pkl"
+data_y_filename = "PATH/dataY.pkl"
 
 index = 771
 kernel_size = 5
