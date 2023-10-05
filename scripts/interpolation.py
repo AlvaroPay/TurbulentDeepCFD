@@ -1,4 +1,14 @@
-#Author: Alvaro Pay Lozano
+# ----------------------------------------------------------------------------
+# Created By  : Álvaro Pay Lozano
+# Institution : TU Munich, Department of Aerospace and Geodesy
+# Created Date: July 12, 2023
+# version ='1.0'
+# ---------------------------------------------------------------------------
+"""
+Different functions to read the CFD VTU files, crop the domain, calculate the SDF and the points inside the bluff 
+and interpolate the CFD results in a new structured 200x200 mesh
+"""
+# ---------------------------------------------------------------------------
 
 import vtk
 import numpy as np
@@ -7,6 +17,19 @@ import faiss
 import cuspatial, cudf
 
 def read_vtu(vtu_path):   
+    """ Read the VTU file with the VTU library and extract Ux, Uy, P, x, y
+    raising an error for non-physical converged cases with a Ux>100
+    
+    Parameters
+    ----------
+    vtu_path: str
+          path of the vtu file
+    Returns
+    -------
+    data: numpy.ndarray
+          average flow field
+    """
+    
     # Create a reader for the VTU file
     reader = vtk.vtkXMLUnstructuredGridReader()
     reader.SetFileName(vtu_path)
@@ -39,28 +62,28 @@ def read_vtu(vtu_path):
 
 def resize(data, xmin, xmax, ymin, ymax):
     """ Reduce the size of the computational domain from the initial size of
-    (xmin=-10, xmax=30, ymin=-10, ymax=10).
+    (xmin=-10, xmax=30, ymin=-12.5, ymax=12.5).
 
     Parameters
     ----------
     data: numpy.ndarray
           raw average flow field
     xmin: float
-          minimum bound upstream of wing geometry
+          minimum bound upstream of bluff geometry
     xmax: float
-          maximum bound downstream of wing geometry
+          maximum bound downstream of bluff geometry
     ymin: float
-          minimum bound below of wing geometry
+          minimum bound below of bluff geometry
     ymax: float
-          minimum bound above of wing geometry
+          minimum bound above of bluff geometry
 
     Returns
     -------
-    data: numpy.ndarray
-          average flow field with new bounds
-
+    coord: numpy.ndarray
+          average x and y points with new bounds
+    fields: numpy.ndarray
+        average Ux, Uy and P points with new bounds
     """
-
     xmask = np.logical_and(data[:, 0] >= xmin, data[:, 0] <= xmax)
     data = data[xmask]
     ymask = np.logical_and(data[:, 1] >= ymin, data[:, 1] <= ymax)
@@ -96,7 +119,7 @@ def interpolate(xmin, xmax, ymin, ymax, k, resolution, gpu_id, bluff, data, mach
     -------
     target_data: numpy.ndarray
                  query array with interpolated coordinates and field data
-                 values in the following column format [x y pMean UxMean UyMean]
+                 values in the following column format [x y UxMean UyMean pMean]
     """
 
     nx = resolution
@@ -118,6 +141,7 @@ def interpolate(xmin, xmax, ymin, ymax, k, resolution, gpu_id, bluff, data, mach
     bluff_points_idx = find_points_inside(xq, bluff)
     sdf_dist, _ = find_knn(bluff, target_data[:, 0:2], 1, gpu_id)
 
+    # set the points inside the wing to -1 for the SDF representation
     sdf_geo_distance = np.copy(sdf_dist)
     sdf_geo_distance[bluff_points_idx] = -1
        
@@ -198,15 +222,16 @@ def find_points_inside(target_points, bluff_points):
     target_points: numpy.ndarray
                    points of interpolation grid
     wing_points: numpy.ndarray
-                 points of wing geometry. Must start and end at the same
+                 points of bluff geometry. Must start and end at the same
                  point in clock- or counterclockwise direction
 
     Returns
     -------
-    points_in_wing_idx: numpy.ndarray
-                        indexes of target_points array which are inside wing
+    points_in_bluff_idx: numpy.ndarray
+                        indexes of target_points array which are inside the bluff
     """
     # Convert numpy arrays to GeoSeries for points_in_polygon(args)
+    
     pts = cuspatial.GeoSeries.from_points_xy(
         cudf.Series(target_points.flatten()))
     plygon = cuspatial.GeoSeries.from_polygons_xy(
