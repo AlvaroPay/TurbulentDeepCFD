@@ -1,3 +1,15 @@
+# ----------------------------------------------------------------------------
+# Created By  : Álvaro Pay Lozano
+# Institution : TU Munich, Department of Aerospace and Geodesy
+# Created Date: September 21, 2023
+# version ='1.0'
+# ---------------------------------------------------------------------------
+"""
+Visualization of the resuls of training using the model output parameters and importing
+the geometry to be predicted and the CFD data to be compared with
+"""
+# ---------------------------------------------------------------------------
+
 import torch
 import pickle
 import matplotlib
