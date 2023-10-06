@@ -1,4 +1,14 @@
-#Author: Alvaro Pay Lozano
+# ----------------------------------------------------------------------------
+# Created By  : Álvaro Pay Lozano
+# Institution : TU Munich, Department of Aerospace and Geodesy
+# Created Date: July 12, 2023
+# version ='1.0'
+# ---------------------------------------------------------------------------
+"""
+Preprocessing main function which extracts the .vtu and .stl geometry from the bluffFOAM dataset, interpolate and crop
+the cfd data and export the geometry array (data_X) and the cfd data (data_Y) in a Pickle file to avoid memory
+"""
+# ---------------------------------------------------------------------------
 
 matplotlib.pyplot as plt
 import numpy as np
@@ -54,7 +64,7 @@ for i, bluff in enumerate(inp):
   # Case
   bluff_stl = bluff.split('_')[0]
   stl_path = f"/local/disk/apay/test/input/{bluff}/constant/triSurface/bluff{bluff_stl}.stl"
-  matching_folders = [f for f in glob.glob(f"/local/disk/apay/test/input/{bluff}/{bluff}/{bluff}_*") if os.path.isdir(f)]
+  matching_folders = [f for f in glob.glob(f"/local/disk/apay/test/input/{bluff}/{bluff}/{bluff}_*") if os.path.isdir(f)] #To find the directory called bluff_{number of iterations}
   
   if not matching_folders:
     print(f"No matching folders found for {bluff}")
